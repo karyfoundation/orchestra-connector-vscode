@@ -6,18 +6,33 @@ const messenger = require('messenger');
 // ─── ACTIVATE EXTENSION ─────────────────────────────────────────────────────────
 //
 
-	exports.activate = context => {
-		for ( let language of [ 'typescript', 'javascript' ] ) {
-            context.subscriptions.push(
-				
-            );
-        }
+	function activate ( context ) {
+		context.subscriptions.push(
+			vscode.commands.registerCommand( 'orchestra.open', ( args ) => {
+				sendOpenRequest( 'hello' );
+			})
+		);
 	}
+
+	exports.activate = activate;
 
 //
 // ─── DEACTIVEATE EXTENSION ──────────────────────────────────────────────────────
 //
 
-	exports.deactivate = ( ) => { };
+	function deactivate ( ) { };
+	exports.deactivate = deactivate;
+
+//
+// ─── GLOBAL DEFS ────────────────────────────────────────────────────────────────
+//
+
+	const orchestraClient = messenger.createSpeaker( 5994 );
+
+	function sendOpenRequest ( address ) {
+		orchestraClient.request( 'open', { address: address }, res => {
+
+		});
+	}
 
 // ────────────────────────────────────────────────────────────────────────────────
