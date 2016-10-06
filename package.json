@@ -1,0 +1,21 @@
+{
+	"name": "orchestra",
+	"displayName": "orchestra",
+	"description": "Connect Visual Studio Code to Orchestra to edit your Quartets dynamiclly.",
+	"version": "0.0.1",
+	"publisher": "karyfoundation",
+	"engines": {
+		"vscode": "^0.10.1"
+	},
+	"categories": [
+		"Other"
+	],
+	"main": "./src/extension.js",
+	"activationEvents": [
+		"onLanguage:typescript",
+		"onLanguage:javascript"
+	],
+	"devDependencies": {
+		"vscode": "0.10.x"
+	}
+}
