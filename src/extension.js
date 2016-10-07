@@ -1,6 +1,11 @@
 
-const vscode = require('vscode');
-const messenger = require('messenger');
+//
+// ─── IMPORTS ────────────────────────────────────────────────────────────────────
+//
+
+	const vscode 			= require('vscode');
+	const getCommentSign 	= require('./commentsign');
+	const messenger 		= require('messenger');
 
 //
 // ─── ACTIVATE EXTENSION ─────────────────────────────────────────────────────────
@@ -8,9 +13,7 @@ const messenger = require('messenger');
 
 	function activate ( context ) {
 		context.subscriptions.push(
-			vscode.commands.registerCommand( 'orchestra.open', ( args ) => {
-				sendOpenRequest( 'hello' );
-			})
+			vscode.commands.registerCommand( 'orchestra.open', openOrchestraBasedOnAddress )
 		);
 	}
 
@@ -24,15 +27,47 @@ const messenger = require('messenger');
 	exports.deactivate = deactivate;
 
 //
-// ─── GLOBAL DEFS ────────────────────────────────────────────────────────────────
+// ─── CLIENT ─────────────────────────────────────────────────────────────────────
 //
 
 	const orchestraClient = messenger.createSpeaker( 5994 );
 
 	function sendOpenRequest ( address ) {
-		orchestraClient.request( 'open', { address: address }, res => {
-
+		orchestraClient.request( 'open', address , response => {
+			vscode.window.showErrorMessage( response );
 		});
+	}
+
+//
+// ─── OPEN ORCHESTRA BASED ON ADDRESS ────────────────────────────────────────────
+//
+
+	function openOrchestraBasedOnAddress ( ) {
+		sendOpenRequest(
+			getAddress( )
+		);
+	}
+
+//
+// ─── GET CURRENT LINE ───────────────────────────────────────────────────────────
+//
+
+	function getCurrentLine ( ) {
+		return vscode.window.activeTextEditor.document.lineAt(
+			vscode.window.activeTextEditor.selection.active.line
+		).text;
+	}
+
+//
+// ─── GET ADDRESS ────────────────────────────────────────────────────────────────
+//
+
+	function getAddress ( ) {
+		const languageCommentSign = getCommentSign( );
+		const line = getCurrentLine( )
+				   .replace( /^\s*\/\/\s*/, '' )
+				   .trim( );
+		return line;
 	}
 
 // ────────────────────────────────────────────────────────────────────────────────
