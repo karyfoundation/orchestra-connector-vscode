@@ -7,6 +7,7 @@
 	const getCommentSign 	= require('./commentsign');
 	const messenger 		= require('messenger');
 	const path 				= require('path');
+	const fs 				= require('fs');
 
 //
 // ─── ACTIVATE EXTENSION ─────────────────────────────────────────────────────────
@@ -50,12 +51,17 @@
 		if ( commentAddress === null ) return;
 
 		// resolve address
-		const address = path.normalize(
-			path.join(
-				vscode.window.activeTextEditor.document.fileName.replace(/[^\/]*$/, ''),
-				commentAddress
-			)
-		);
+		const address;
+		if ( existsSync( commentAddress ) ) {
+			address = commentAddress;
+		} else {
+			address = path.normalize(
+				path.join(
+					vscode.window.activeTextEditor.document.fileName.replace(/[^\/]*$/, ''),
+					commentAddress
+				)
+			);
+		}
 
 		vscode.window.showErrorMessage( address );
 
@@ -102,5 +108,19 @@
 			}
 		}
 	}
+
+//
+// ─── FS EXSISTS ─────────────────────────────────────────────────────────────────
+//
+
+	function existsSync ( filename ) {
+        try {
+            fs.accessSync( filename );
+            return true;
+        } catch( ex ) {
+            return false;
+        }
+    }
+
 
 // ────────────────────────────────────────────────────────────────────────────────
