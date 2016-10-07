@@ -1,13 +1,9 @@
-# README
-## This is the README for your extension "orchestra" 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
 
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
+# Orchestra Connector for Visual Studio Code
 
-### For more information
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-** Enjoy!**
+If you use a comment in your files like this:
+```
+// /path/to/the/quartet/file/of/myRegEx/file.quartet
+let myRegEx = /something/g;
+```
+If you place the caret on either comment line or the regex line and press `alt+q`, Connector will open the Quartet in an Orchestra window and then when you save the file it will update your code.
