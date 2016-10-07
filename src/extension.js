@@ -6,6 +6,7 @@
 	const vscode 			= require('vscode');
 	const getCommentSign 	= require('./commentsign');
 	const messenger 		= require('messenger');
+	const path 				= require('path');
 
 //
 // ─── ACTIVATE EXTENSION ─────────────────────────────────────────────────────────
@@ -13,7 +14,8 @@
 
 	function activate ( context ) {
 		context.subscriptions.push(
-			vscode.commands.registerCommand( 'orchestra.open', openOrchestraBasedOnAddress )
+			vscode.commands.registerCommand(
+				'orchestra.open', openOrchestraBasedOnAddress )
 		);
 	}
 
@@ -43,31 +45,62 @@
 //
 
 	function openOrchestraBasedOnAddress ( ) {
-		sendOpenRequest(
-			getAddress( )
+		// get address
+		const commentAddress = getAddressFromComment( );
+		if ( commentAddress === null ) return;
+
+		// resolve address
+		const address = path.normalize(
+			path.join(
+				vscode.window.activeTextEditor.document.fileName.replace(/[^\/]*$/, ''),
+				commentAddress
+			)
 		);
+
+		vscode.window.showErrorMessage( address );
+
+		// open address
+		sendOpenRequest( address );
 	}
 
 //
 // ─── GET CURRENT LINE ───────────────────────────────────────────────────────────
 //
 
-	function getCurrentLine ( ) {
-		return vscode.window.activeTextEditor.document.lineAt(
-			vscode.window.activeTextEditor.selection.active.line
-		).text;
+	function getLineAt ( lineNumber ) {
+		return vscode.window.activeTextEditor.document.lineAt( lineNumber ).text;
 	}
 
 //
 // ─── GET ADDRESS ────────────────────────────────────────────────────────────────
 //
 
-	function getAddress ( ) {
+	function getAddressFromComment ( ) {
+		// defs
 		const languageCommentSign = getCommentSign( );
-		const line = getCurrentLine( )
-				   .replace( /^\s*\/\/\s*/, '' )
-				   .trim( );
-		return line;
+		const currentLineNumber = vscode.window.activeTextEditor.selection.active.line;
+
+		// finding the comment line
+		var lineNum = currentLineNumber;
+		while ( true ) {
+			var line = getLineAt( lineNum );
+			if ( /^\s*\/\/\s*.+\.quartet\s*/.test( line ) ) {
+				return line.trim( ).replace(/^\s*\/\/\s*/, '');
+
+			} else if ( lineNum === 1 ) {
+				return null;
+
+			} else if ( lineNum === currentLineNumber ) {
+				lineNum--;
+
+			} else if ( /^\s*$/.test( line ) && lineNum > 1 ) {
+				lineNum--;
+
+			} else {
+				vscode.window.showErrorMessage('No Quartet file reference was found.');
+				return null;
+			}
+		}
 	}
 
 // ────────────────────────────────────────────────────────────────────────────────
