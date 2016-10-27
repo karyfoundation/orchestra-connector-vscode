@@ -23,7 +23,7 @@
 	exports.activate = activate;
 
 //
-// ─── DEACTIVEATE EXTENSION ──────────────────────────────────────────────────────
+// ─── DEACTIVATE EXTENSION ──────────────────────────────────────────────────────
 //
 
 	function deactivate ( ) { };
@@ -35,9 +35,12 @@
 
 	const orchestraClient = messenger.createSpeaker( 5994 );
 
-	function sendOpenRequest ( address ) {
+	function sendOpenRequest ( address, currentLine ) {
 		orchestraClient.request( 'open', address , response => {
-			vscode.window.showErrorMessage( response );
+			switch ( response.kind ) {
+				default:
+
+			}
 		});
 	}
 
@@ -46,27 +49,13 @@
 //
 
 	function openOrchestraBasedOnAddress ( ) {
-		// get address
-		const commentAddress = getAddressFromComment( );
-		if ( commentAddress === null ) return;
-
-		// resolve address
-		const address;
-		if ( existsSync( commentAddress ) ) {
-			address = commentAddress;
+		const currentLine = vscode.window.activeTextEditor.selection.active.line;
+		const address = getAddress( );
+		if ( existsSync( address ) ) {
+			sendOpenRequest( address );
 		} else {
-			address = path.normalize(
-				path.join(
-					vscode.window.activeTextEditor.document.fileName.replace(/[^\/]*$/, ''),
-					commentAddress
-				)
-			);
+			vscode.window.showErrorMessage('The file does not exists');
 		}
-
-		vscode.window.showErrorMessage( address );
-
-		// open address
-		sendOpenRequest( address );
 	}
 
 //
@@ -75,6 +64,29 @@
 
 	function getLineAt ( lineNumber ) {
 		return vscode.window.activeTextEditor.document.lineAt( lineNumber ).text;
+	}
+
+//
+// ─── GET ADDRESS ────────────────────────────────────────────────────────────────
+//
+
+	function getAddress ( ) {
+		// get address
+		const commentAddress = getAddressFromComment( );
+		if ( commentAddress === null ) return;
+
+		// resolve address
+		if ( existsSync( commentAddress ) ) {
+			return commentAddress;
+		} else {
+			return path.normalize(
+				path.join(
+					vscode.window.activeTextEditor.document.fileName
+						  .replace(/[^\/]*$/, ''),
+					commentAddress
+				)
+			);
+		}
 	}
 
 //
@@ -110,7 +122,7 @@
 	}
 
 //
-// ─── FS EXSISTS ─────────────────────────────────────────────────────────────────
+// ─── FS EXISTS ─────────────────────────────────────────────────────────────────
 //
 
 	function existsSync ( filename ) {
